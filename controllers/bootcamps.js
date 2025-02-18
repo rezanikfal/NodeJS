@@ -6,6 +6,7 @@ exports.getBootcamps = async (req, res, next) => {
 
         res.status(200).json({
             success: true,
+            count: bootcamps.length,
             data: bootcamps
         });
     } catch (err) {
@@ -20,11 +21,11 @@ exports.getBootcamp = async (req, res, next) => {
     try {
         const bootcamp = await Bootcamp.findById(req.params.id);
 
-        if (!bootcamp){
+        if (!bootcamp) {
             return res.status(404).json({
                 success: false,
                 message: 'Bootcamp not found'
-            })
+            });
         }
 
         res.status(200).json({
@@ -56,10 +57,54 @@ exports.createBootcamp = async (req, res, next) => {
     }
 };
 
-exports.updateBootcamps = (req, res, next) => {
-    res.status(200).json({success: true, msg: `Update bootcamp id: ${req.params.id}`});
+exports.updateBootcamps = async (req, res, next) => {
+    try {
+        const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body,
+            {
+                new: true, //Returns the updated document.
+                runValidators: true
+            });
+
+        if (!bootcamp) {
+            return res.status(404).json({
+                success: false,
+                message: 'Bootcamp not found'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: bootcamp
+        });
+
+    } catch (err) {
+        res.status(400).json({
+            success: false,
+            message: err.message
+        });
+    }
 };
 
-exports.deleteBootcamps = (req, res, next) => {
-    res.status(200).json({success: true, msg: `Delete bootcamp id: ${req.params.id}`});
+exports.deleteBootcamps = async (req, res, next) => {
+    try {
+        const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id);
+
+        if (!bootcamp) {
+            return res.status(404).json({
+                success: false,
+                message: 'Bootcamp not found'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: {}
+        });
+
+    } catch (err) {
+        res.status(400).json({
+            success: false,
+            message: err.message
+        });
+    }
 };
